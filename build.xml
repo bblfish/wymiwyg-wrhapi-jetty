@@ -2,10 +2,10 @@
 
 	<!-- the classpath -->
 	<path id="project.class.path">
-		<fileset dir="../wymiwyg-commons/lib">
+		<fileset dir="../wymiwyg-commons-core/lib">
 			<include name="*.jar" />
 		</fileset>
-		<fileset dir="../wymiwyg-commons/build">
+		<fileset dir="../wymiwyg-commons-core/build">
 			<include name="*.jar" />
 		</fileset>
 		<fileset dir="lib">

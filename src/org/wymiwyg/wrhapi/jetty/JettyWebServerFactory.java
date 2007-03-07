@@ -81,6 +81,20 @@ public class JettyWebServerFactory extends WebServerFactory {
 						} catch (HandlerException e1) {
 							throw new RuntimeException(e1);
 						}
+                    } catch  (final Exception e) {
+                    	responseImpl.setResponseStatus(ResponseStatus.INTERNAL_SERVER_ERROR);
+                    	try {
+							responseImpl.setBody(new MessageBody2Write() {
+								public void writeTo(WritableByteChannel out) throws IOException {
+									PrintWriter printWriter = new PrintWriter(Channels.newWriter(out, "utf-8"));
+									printWriter.println("A runtime exception occured (see logs for details)");
+									printWriter.close();
+								}
+								
+							});
+						} catch (HandlerException e1) {
+							throw new RuntimeException(e1);
+						}
                     }
                     try {
 						responseImpl.commitIfNeeded();

@@ -16,6 +16,8 @@
  */
 package org.wymiwyg.wrhapi.jetty;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.mortbay.jetty.Connector;
 import org.mortbay.jetty.Server;
 import org.mortbay.jetty.handler.AbstractHandler;
@@ -44,6 +46,9 @@ import javax.servlet.http.HttpServletResponse;
  *
  */
 public class JettyWebServerFactory extends WebServerFactory {
+	
+	private static final Log log = LogFactory.getLog(JettyWebServerFactory.class);
+	
     /* (non-Javadoc)
      * @see org.wymiwyg.wrhapi.WebServerFactory#startNewWebServer(org.wymiwyg.wrhapi.Handler, org.wymiwyg.wrhapi.ServerBinding)
      */
@@ -68,7 +73,7 @@ public class JettyWebServerFactory extends WebServerFactory {
                             responseImpl);
                         
                     } catch (final HandlerException e) {
-                    	responseImpl.setResponseStatus(ResponseStatus.INTERNAL_SERVER_ERROR);
+                    	responseImpl.setResponseStatus(e.getStatus());
                     	try {
 							responseImpl.setBody(new MessageBody2Write() {
 								public void writeTo(WritableByteChannel out) throws IOException {
@@ -81,7 +86,8 @@ public class JettyWebServerFactory extends WebServerFactory {
 						} catch (HandlerException e1) {
 							throw new RuntimeException(e1);
 						}
-                    } catch  (final Exception e) {
+                    } /*catch  (final RuntimeException e) {
+                    	log.error("Runtime exception handling request", e);
                     	responseImpl.setResponseStatus(ResponseStatus.INTERNAL_SERVER_ERROR);
                     	try {
 							responseImpl.setBody(new MessageBody2Write() {
@@ -95,7 +101,7 @@ public class JettyWebServerFactory extends WebServerFactory {
 						} catch (HandlerException e1) {
 							throw new RuntimeException(e1);
 						}
-                    }
+                    } */
                     try {
 						responseImpl.commitIfNeeded();
 					} catch (HandlerException e) {

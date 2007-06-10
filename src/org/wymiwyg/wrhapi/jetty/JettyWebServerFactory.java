@@ -53,7 +53,7 @@ public class JettyWebServerFactory extends WebServerFactory {
      * @see org.wymiwyg.wrhapi.WebServerFactory#startNewWebServer(org.wymiwyg.wrhapi.Handler, org.wymiwyg.wrhapi.ServerBinding)
      */
     public WebServer startNewWebServer(final Handler handler,
-        ServerBinding configuration) throws IOException {
+        final ServerBinding configuration) throws IOException {
         Server server = new Server() {
                 /*
                  * public void handle(HttpConnection connection) {
@@ -69,7 +69,7 @@ public class JettyWebServerFactory extends WebServerFactory {
                 	ResponseImpl responseImpl = new ResponseImpl(servletResponse);
                     try {
                         
-                        handler.handle(new RequestImpl(servletRequest),
+                        handler.handle(new RequestImpl(servletRequest, configuration.getPort()),
                             responseImpl);
                         
                     } catch (final HandlerException e) {

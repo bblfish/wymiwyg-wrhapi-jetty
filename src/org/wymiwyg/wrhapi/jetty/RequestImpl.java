@@ -22,6 +22,7 @@ import org.wymiwyg.wrhapi.MessageBody;
 import org.wymiwyg.wrhapi.Method;
 import org.wymiwyg.wrhapi.Request;
 import org.wymiwyg.wrhapi.RequestURI;
+import org.wymiwyg.wrhapi.URIScheme;
 import org.wymiwyg.wrhapi.util.MessageBody2Read;
 
 import java.io.IOException;
@@ -50,27 +51,26 @@ public class RequestImpl implements Request {
     HttpServletRequest servletRequest;
     private Method method;
     private RequestURI requestURI;
+	private int port;
 
-    /**
-     * @param servletRequest
-     */
-    public RequestImpl(HttpServletRequest servletRequest)
+    RequestImpl(HttpServletRequest servletRequest, int port)
         throws IOException {
         body = servletRequest.getInputStream();
         method = Method.get(servletRequest.getMethod());
         this.servletRequest = servletRequest;
         this.requestURI = new RequestURIImp(servletRequest);
+        this.port = port;
     }
 
     /**
-     * @see org.wymiwyg.rwcf.Request#getMethod()
+     * @see org.wymiwyg.wrhapi.Request#getMethod()
      */
     public Method getMethod() {
         return method;
     }
 
     /**
-     * @see org.wymiwyg.rwcf.Request#getRequestURI()
+     * @see org.wymiwyg.wrhapi.Request#getRequestURI()
      */
     public RequestURI getRequestURI() {
         return requestURI;
@@ -78,16 +78,16 @@ public class RequestImpl implements Request {
 
     /**
      * @deprecated
-     * @see org.wymiwyg.rwcf.Request#getBody()
+     * @see org.wymiwyg.wrhapi.Request#getBody()
      */
     public Object getBody() {
         return body;
     }
 
     /**
-     * @see org.wymiwyg.rwcf.Request#getHeaderNames()
+     * @see org.wymiwyg.wrhapi.Request#getHeaderNames()
      */
-    public HeaderName[] getHeaderNames() {
+    public Set<HeaderName> getHeaderNames() {
         Set<HeaderName> headerNames = new HashSet<HeaderName>();
         Enumeration enumeration = servletRequest.getHeaderNames();
 
@@ -95,11 +95,11 @@ public class RequestImpl implements Request {
             headerNames.add(HeaderName.get((String) enumeration.nextElement()));
         }
 
-        return (HeaderName[]) headerNames.toArray(new HeaderName[headerNames.size()]);
+        return headerNames;
     }
 
     /**
-     * @see org.wymiwyg.rwcf.Request#getHeaderValues(java.lang.String)
+     * @see org.wymiwyg.wrhapi.Request#getHeaderValues(java.lang.String)
      */
     public String[] getHeaderValues(HeaderName headerName) {
         List<String> resultList = new ArrayList<String>();
@@ -125,22 +125,17 @@ public class RequestImpl implements Request {
         }
     }
 
-    /**
-     * @see org.wymiwyg.rwcf.Request#getPort()
-     */
+    
     public int getPort() {
-        return servletRequest.getServerPort();
+        return port;
     }
 
-    /**
-     * @see org.wymiwyg.rwcf.Request#getScheme()
-     */
-    public String getScheme() {
-        return servletRequest.getScheme();
-    }
+    public URIScheme getScheme() {
+		return URIScheme.getURISchemeFromLowercaseString(servletRequest.getScheme());
+	}
 
     /* (non-Javadoc)
-     * @see org.wymiwyg.rwcf.Request#getRemoteHost()
+     * @see org.wymiwyg.wrhapi.Request#getRemoteHost()
      */
     public InetAddress getRemoteHost() throws HandlerException {
         try {
@@ -149,13 +144,6 @@ public class RequestImpl implements Request {
             throw new RuntimeException(
                 "HttpServletRequest returned invalid remote-host address");
         }
-    }
-
-    /* (non-Javadoc)
-     * @see org.wymiwyg.rwcf.Request#getOriginalRequest()
-     */
-    public Request getOriginalRequest() {
-        return this;
     }
 
 	/* (non-Javadoc)

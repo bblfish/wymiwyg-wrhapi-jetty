@@ -40,6 +40,7 @@ import javax.servlet.http.HttpServletRequest;
 public class RequestURIImp implements RequestURI {
     private HttpServletRequest servletRequest;
     private Map<String, String[]> parameterMap;
+	private String queryString;
 
     /**
      * @param servletRequest
@@ -47,7 +48,7 @@ public class RequestURIImp implements RequestURI {
     public RequestURIImp(HttpServletRequest servletRequest) {
         this.servletRequest = servletRequest;
 
-        String queryString = servletRequest.getQueryString();
+        queryString = servletRequest.getQueryString();
 
         if (queryString != null) {
             try {
@@ -70,6 +71,9 @@ public class RequestURIImp implements RequestURI {
         while (tokens.hasMoreTokens()) {
             String keyValue = tokens.nextToken();
             int equalsPos = keyValue.indexOf('=');
+            if (equalsPos == -1) {
+            	continue;
+            }
             String key = keyValue.substring(0, equalsPos);
             String[] values = (String[]) result.get(key);
 
@@ -89,16 +93,11 @@ public class RequestURIImp implements RequestURI {
         return result;
     }
 
-    /**
-     * @see org.wymiwyg.rwcf.RequestURI#getPath()
-     */
     public String getPath() {
         return servletRequest.getRequestURI();
     }
 
-    /**
-     * @see org.wymiwyg.rwcf.RequestURI#getParameterNames()
-     */
+
     public String[] getParameterNames() {
         Set<String> keySet = parameterMap.keySet();
         SortedSet<String> sortedKeys = new TreeSet<String>(keySet);
@@ -106,16 +105,12 @@ public class RequestURIImp implements RequestURI {
         return (String[]) sortedKeys.toArray(new String[keySet.size()]);
     }
 
-    /**
-     * @see org.wymiwyg.rwcf.RequestURI#getParamterValues(java.lang.String)
-     */
+
     public String[] getParameterValues(String name) {
         return (String[]) parameterMap.get(name);
     }
 
-    /**
-     * @see java.lang.Object#toString()
-     */
+    @Override
     public String toString() {
         StringBuffer buffer = new StringBuffer(getPath());
         boolean first = true;
@@ -145,4 +140,17 @@ public class RequestURIImp implements RequestURI {
 
         return buffer.toString();
     }
+
+	public String getAbsPath() {
+		return getPath()+"?"+queryString;
+	}
+
+	public Type getType() {
+		// TODO implement
+		return Type.ABS_PATH;
+	}
+
+	public String getQuery() {
+		return queryString;
+	}
 }

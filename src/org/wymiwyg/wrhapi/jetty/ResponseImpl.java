@@ -16,23 +16,21 @@
  */
 package org.wymiwyg.wrhapi.jetty;
 
+import java.io.IOException;
+import java.nio.channels.Channels;
+import java.nio.channels.WritableByteChannel;
+import java.util.Iterator;
+import java.util.Map;
+
+import javax.servlet.http.HttpServletResponse;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-
 import org.wymiwyg.wrhapi.HandlerException;
 import org.wymiwyg.wrhapi.HeaderName;
 import org.wymiwyg.wrhapi.MessageBody;
 import org.wymiwyg.wrhapi.ResponseStatus;
 import org.wymiwyg.wrhapi.util.ResponseBase;
-
-import java.io.IOException;
-
-import java.nio.channels.Channels;
-import java.nio.channels.WritableByteChannel;
-
-import java.util.Iterator;
-
-import javax.servlet.http.HttpServletResponse;
 
 
 /**
@@ -56,9 +54,6 @@ public class ResponseImpl extends ResponseBase {
         this.servletResponse = servletResponse;
     }
 
-    /**
-     * @see org.wymiwyg.rwcf.Response#setBody(java.lang.Object)
-     */
     public void setBody(MessageBody body) throws HandlerException {
         commitHeader();
 
@@ -73,9 +68,6 @@ public class ResponseImpl extends ResponseBase {
         }
     }
 
-    /**
-     *
-     */
     private void commitHeader() throws HandlerException {
         synchronized (this) {
             if (committed == true) {
@@ -113,11 +105,12 @@ public class ResponseImpl extends ResponseBase {
      *
      */
     private void writeHeaders() {
-        Iterator keyIter = headerMap.keySet().iterator();
+    	Map<HeaderName, String[]> headerMap = getHeaderMap();
+        Iterator<HeaderName> keyIter = headerMap.keySet().iterator();
 
         while (keyIter.hasNext()) {
-            HeaderName current = (HeaderName) keyIter.next();
-            String[] values = (String[]) headerMap.get(current);
+            HeaderName current =  keyIter.next();
+            String[] values = headerMap.get(current);
 
             if (current.equals(HeaderName.SET_COOKIE)) {
                 /*
@@ -163,33 +156,8 @@ public class ResponseImpl extends ResponseBase {
         return buffer.toString();
     }
 
-    /**
-     * @see org.wymiwyg.rwcf.Response#setHeader(java.lang.String,
-     *      java.lang.Object)
-     */
-    public void setHeader(HeaderName headerName, Object value) {
-        if (value instanceof String[]) {
-            headerMap.put(headerName, (String[]) value);
-        } else {
-            if (!(value instanceof Object[])) {
-                String[] values = new String[1];
-                values[0] = value.toString();
-                headerMap.put(headerName, values);
-            } else {
-                Object[] array = (Object[]) value;
-                String[] values = new String[array.length];
+    
 
-                for (int i = 0; i < array.length; i++) {
-                    values[i] = array[i].toString();
-                }
-                headerMap.put(headerName, values);
-            }
-        }
-    }
-
-    /**
-     * @see org.wymiwyg.rwcf.Response#setResponseStatus(org.wymiwyg.rwcf.modeler.ResponseStatus)
-     */
     public void setResponseStatus(ResponseStatus status) {
         this.status = status;
     }

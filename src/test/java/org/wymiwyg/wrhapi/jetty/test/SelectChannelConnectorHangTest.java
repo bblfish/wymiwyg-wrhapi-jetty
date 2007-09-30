@@ -47,7 +47,7 @@ public class SelectChannelConnectorHangTest extends TestCase {
     public void testNotHanging() throws Exception {
         Thread thread = new Thread() {
                 public void run() {
-                    for (int i = 0; i < 100; i++) {
+                    for (int i = 0; i < 50; i++) {
                         log.info("round " + i);
 
                         Server server = new Server();

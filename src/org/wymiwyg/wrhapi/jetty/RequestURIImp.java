@@ -142,7 +142,7 @@ public class RequestURIImp implements RequestURI {
     }
 
 	public String getAbsPath() {
-		return getPath()+"?"+queryString;
+		return getPath()+(queryString == null? "":"?"+queryString);
 	}
 
 	public Type getType() {

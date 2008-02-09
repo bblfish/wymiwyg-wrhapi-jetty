@@ -36,74 +36,77 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-
 /**
  * @author reto
- *
+ * 
  */
 public class SelectChannelConnectorHangTest extends TestCase {
-    private final static Log log = LogFactory.getLog(SelectChannelConnectorHangTest.class);
+	private final static Log log = LogFactory
+			.getLog(SelectChannelConnectorHangTest.class);
 
-    public void testNotHanging() throws Exception {
-        Thread thread = new Thread() {
-                public void run() {
-                    for (int i = 0; i < 50; i++) {
-                        log.info("round " + i);
+	/**
+	 * tests continuous restarting of wrhapi
+	 * 
+	 * @throws Exception
+	 */
+	public void testNotHanging() throws Exception {
+		Thread thread = new Thread() {
+			public void run() {
+				for (int i = 0; i < 50; i++) {
+					log.info("round " + i);
 
-                        Server server = new Server();
-                        server.addHandler(new AbstractHandler() {
-                                public void handle(String arg0,
-                                    HttpServletRequest request,
-                                    HttpServletResponse response, int arg3)
-                                    throws IOException, ServletException {
-                                    response.setStatus(200);
-                                    response.setHeader("Content-Type",
-                                        "text/plain");
+					Server server = new Server();
+					server.addHandler(new AbstractHandler() {
+						public void handle(String arg0,
+								HttpServletRequest request,
+								HttpServletResponse response, int arg3)
+								throws IOException, ServletException {
+							response.setStatus(200);
+							response.setHeader("Content-Type", "text/plain");
 
-                                    final OutputStream out = response.getOutputStream();
-                                    out.write("Hello".getBytes());
-                                    out.close();
-                                }
-                            });
+							final OutputStream out = response.getOutputStream();
+							out.write("Hello".getBytes());
+							out.close();
+						}
+					});
 
-                        //with the following it works
-                        //Connector connector = new BlockingChannelConnector();
+					// with the following it works
+					// Connector connector = new BlockingChannelConnector();
 
-                        //with the following it works only for a few round
-                        Connector connector = new SelectChannelConnector();
-                        connector.setPort(8181);
-                        server.addConnector(connector);
+					// with the following it works only for a few round
+					Connector connector = new SelectChannelConnector();
+					connector.setPort(8181);
+					server.addConnector(connector);
 
-                        try {
-                            server.start();
-                            Thread.sleep(100);
+					try {
+						server.start();
+						Thread.sleep(100);
 
-                            URL serverURL = new URL("http://localhost:8181/");
-                            InputStream in = serverURL.openStream();
+						URL serverURL = new URL("http://localhost:8181/");
+						InputStream in = serverURL.openStream();
 
-                            for (int ch = in.read(); ch != -1;
-                                    ch = in.read()) {
-                                System.out.write(ch);
-                            }
+						for (int ch = in.read(); ch != -1; ch = in.read()) {
+							System.out.write(ch);
+						}
 
-                            System.out.println();
-                            in.close();
-                            server.stop();
+						System.out.println();
+						in.close();
+						server.stop();
 
-                            while (server.isStopping()) {
-                                log.info("waiting for jetty to stop");
-                                Thread.sleep(100);
-                            }
-                        } catch (Exception e) {
-                            throw new RuntimeException(e);
-                        }
-                    }
-                }
-            };
+						while (server.isStopping()) {
+							log.info("waiting for jetty to stop");
+							Thread.sleep(100);
+						}
+					} catch (Exception e) {
+						throw new RuntimeException(e);
+					}
+				}
+			}
+		};
 
-        thread.start();
-        //increase if using a slow computer
-        thread.join(30 * 1000);
-        assertFalse(thread.isAlive());
-    }
+		thread.start();
+		// increase if using a slow computer
+		thread.join(30 * 1000);
+		assertFalse(thread.isAlive());
+	}
 }

@@ -89,7 +89,7 @@ public class RequestImpl implements Request {
      */
     public Set<HeaderName> getHeaderNames() {
         Set<HeaderName> headerNames = new HashSet<HeaderName>();
-        Enumeration enumeration = servletRequest.getHeaderNames();
+        Enumeration<?> enumeration = servletRequest.getHeaderNames();
 
         while (enumeration.hasMoreElements()) {
             headerNames.add(HeaderName.get((String) enumeration.nextElement()));
@@ -103,14 +103,14 @@ public class RequestImpl implements Request {
      */
     public String[] getHeaderValues(HeaderName headerName) {
         List<String> resultList = new ArrayList<String>();
-        Enumeration headerEnun = servletRequest.getHeaders(headerName.toString());
+        Enumeration<?> headerEnun = servletRequest.getHeaders(headerName.toString());
 
         while (headerEnun.hasMoreElements()) {
             String current = (String) headerEnun.nextElement();
             splitHeaderField(current, resultList);
         }
 
-        return (String[]) resultList.toArray(new String[resultList.size()]);
+        return resultList.toArray(new String[resultList.size()]);
     }
 
     /**

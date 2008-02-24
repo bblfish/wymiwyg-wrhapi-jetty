@@ -16,21 +16,6 @@
  */
 package org.wymiwyg.wrhapi.jetty;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-import org.mortbay.jetty.Connector;
-import org.mortbay.jetty.Server;
-import org.mortbay.jetty.handler.AbstractHandler;
-import org.mortbay.jetty.nio.BlockingChannelConnector;
-
-import org.wymiwyg.wrhapi.Handler;
-import org.wymiwyg.wrhapi.HandlerException;
-import org.wymiwyg.wrhapi.ResponseStatus;
-import org.wymiwyg.wrhapi.ServerBinding;
-import org.wymiwyg.wrhapi.WebServer;
-import org.wymiwyg.wrhapi.WebServerFactory;
-import org.wymiwyg.wrhapi.util.MessageBody2Write;
-
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.nio.channels.Channels;
@@ -40,6 +25,17 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.mortbay.jetty.Connector;
+import org.mortbay.jetty.Server;
+import org.mortbay.jetty.handler.AbstractHandler;
+import org.mortbay.jetty.nio.BlockingChannelConnector;
+import org.wymiwyg.wrhapi.Handler;
+import org.wymiwyg.wrhapi.HandlerException;
+import org.wymiwyg.wrhapi.ServerBinding;
+import org.wymiwyg.wrhapi.WebServer;
+import org.wymiwyg.wrhapi.WebServerFactory;
+import org.wymiwyg.wrhapi.util.MessageBody2Write;
+
 
 /**
  * @author reto
@@ -47,7 +43,7 @@ import javax.servlet.http.HttpServletResponse;
  */
 public class JettyWebServerFactory extends WebServerFactory {
 	
-	private static final Log log = LogFactory.getLog(JettyWebServerFactory.class);
+	//private static final Log log = LogFactory.getLog(JettyWebServerFactory.class);
 	
     /* (non-Javadoc)
      * @see org.wymiwyg.wrhapi.WebServerFactory#startNewWebServer(org.wymiwyg.wrhapi.Handler, org.wymiwyg.wrhapi.ServerBinding)

@@ -1,7 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0"
-	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+	<parent>
+		<artifactId>wymiwyg</artifactId>
+		<groupId>org.wymiwyg</groupId>
+		<version>0.9.1</version>
+	</parent>
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org.wymiwyg</groupId>
 	<artifactId>wrhapi-jetty</artifactId>
@@ -23,7 +26,12 @@
 			<artifactId>org.osgi.core</artifactId>
 			<version>1.0.0</version>
 		</dependency>
-	</dependencies>
+	  <dependency>
+      <groupId>org.wymiwyg</groupId>
+      <artifactId>wrhapi-testing</artifactId>
+      <version>0.2.1</version>
+    </dependency>
+  </dependencies>
 	<build>
 		<plugins>
 			<plugin>
@@ -82,4 +90,3 @@
 		</repository>
 	</distributionManagement>
 </project>
-

@@ -8,7 +8,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org.wymiwyg</groupId>
 	<artifactId>wrhapi-jetty</artifactId>
-	<version>0.2.1</version>
+	<version>0.2.2</version>
 	<packaging>bundle</packaging>
 	<dependencies>
 		<dependency>
@@ -77,6 +77,18 @@
 						<!-- <Import-Package>!javax.servlet,javax.servlet;version>=2.3,javax.servlet.http;version=2.3,*</Import-Package> -->
 					</instructions>
 				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.felix</groupId>
+				<artifactId>maven-scr-plugin</artifactId>
+				<executions>
+					<execution>
+						<id>generate-scr-scrdescriptor</id>
+						<goals>
+							<goal>scr</goal>
+						</goals>
+					</execution>
+				</executions>
 			</plugin>
 		</plugins>
 	</build>

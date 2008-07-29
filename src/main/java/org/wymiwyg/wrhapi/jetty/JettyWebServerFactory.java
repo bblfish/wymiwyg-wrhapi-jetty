@@ -39,7 +39,8 @@ import org.wymiwyg.wrhapi.util.MessageBody2Write;
 
 /**
  * @author reto
- *
+ * @scr.component
+ * @scr.service interface="org.wymiwyg.wrhapi.WebServerFactory"
  */
 public class JettyWebServerFactory extends WebServerFactory {
 	

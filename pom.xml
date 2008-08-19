@@ -10,11 +10,12 @@
 	<artifactId>wrhapi-jetty</artifactId>
 	<version>0.2.2</version>
 	<packaging>bundle</packaging>
+	<name>WRHAPI Jetty</name>
 	<dependencies>
 		<dependency>
 			<groupId>org.wymiwyg</groupId>
 			<artifactId>wrhapi</artifactId>
-			<version>0.2.0</version>
+			<version>0.2.2</version>
 		</dependency>
 		<dependency>
 			<groupId>org.mortbay.jetty</groupId>
@@ -26,12 +27,13 @@
 			<artifactId>org.osgi.core</artifactId>
 			<version>1.0.0</version>
 		</dependency>
-	  <dependency>
-      <groupId>org.wymiwyg</groupId>
-      <artifactId>wrhapi-testing</artifactId>
-      <version>0.2.1</version>
-    </dependency>
-  </dependencies>
+		<dependency>
+			<groupId>org.wymiwyg</groupId>
+			<artifactId>wrhapi-testing</artifactId>
+			<version>0.2.2</version>
+			<scope>test</scope>
+		</dependency>
+	</dependencies>
 	<build>
 		<plugins>
 			<plugin>
@@ -69,11 +71,12 @@
 						</Private-Package>
 						<!-- <Embed-Dependency>jetty;scope=compile|runtime</Embed-Dependency>
 							<Embed-Transitive>true</Embed-Transitive> -->
-						<Bundle-Activator>
+						<!-- <Bundle-Activator>
 							org.wymiwyg.wrhapi.jetty.Activator
-						</Bundle-Activator>
+						</Bundle-Activator> -->
 						<Import-Package>
-						org.mortbay.jetty.*;version="6.1.7", *</Import-Package>
+						org.mortbay.jetty.*;version="6.1.7", *
+						</Import-Package>
 						<!-- <Import-Package>!javax.servlet,javax.servlet;version>=2.3,javax.servlet.http;version=2.3,*</Import-Package> -->
 					</instructions>
 				</configuration>

@@ -60,9 +60,11 @@ public class ResponseImpl extends ResponseBase {
         try {
             //servletResponse.getOutputStream().write("hello\n".getBytes());
             //servletResponse.flushBuffer();
-            WritableByteChannel out = Channels.newChannel(servletResponse.getOutputStream());
-            body.writeTo(out);
-            out.close();
+			if (body != null) {
+				WritableByteChannel out = Channels.newChannel(servletResponse.getOutputStream());
+				body.writeTo(out);
+				out.close();
+			}
         } catch (IOException e1) {
             throw new HandlerException(e1);
         }

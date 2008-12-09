@@ -46,15 +46,7 @@ public class JettyWebServerFactory extends WebServerFactory {
 	
 	//private static final Log log = LogFactory.getLog(JettyWebServerFactory.class);
 	
-	/**
-	 * @scr.reference
-	 */
-	private Handler handler;
-	
-	public  WebServer startNewWebServer(
-			ServerBinding serverBinding) throws IOException {
-		return startNewWebServer(handler, serverBinding);
-	}
+
 	
     /* (non-Javadoc)
      * @see org.wymiwyg.wrhapi.WebServerFactory#startNewWebServer(org.wymiwyg.wrhapi.Handler, org.wymiwyg.wrhapi.ServerBinding)

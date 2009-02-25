@@ -25,7 +25,7 @@ import org.wymiwyg.wrhapi.test.BaseTests;
  * @author reto
  *
  */
-public class DefaultTests extends BaseTests {
+public class DefaultTest extends BaseTests {
     /* (non-Javadoc)
      * @see org.wymiwyg.wrhapi.test.BaseTests#createServer()
      */

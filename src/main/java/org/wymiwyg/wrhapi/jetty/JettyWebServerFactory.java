@@ -28,7 +28,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.mortbay.jetty.Connector;
 import org.mortbay.jetty.Server;
 import org.mortbay.jetty.handler.AbstractHandler;
-import org.mortbay.jetty.nio.BlockingChannelConnector;
+import org.mortbay.jetty.nio.SelectChannelConnector;
 import org.wymiwyg.wrhapi.Handler;
 import org.wymiwyg.wrhapi.HandlerException;
 import org.wymiwyg.wrhapi.ServerBinding;
@@ -109,13 +109,19 @@ public class JettyWebServerFactory extends WebServerFactory {
                 }
             });
 
-        Connector connector = new BlockingChannelConnector();
+        Connector connector = new SelectChannelConnector();//BlockingChannelConnector();
         connector.setPort(configuration.getPort());
         server.addConnector(connector);
 
         try {
             server.start();
         } catch (Exception e) {
+			if (e instanceof IOException) {
+				throw (IOException)e;
+			}
+			if (e instanceof RuntimeException) {
+				throw (RuntimeException)e;
+			}
             throw new RuntimeException(e);
         }
 

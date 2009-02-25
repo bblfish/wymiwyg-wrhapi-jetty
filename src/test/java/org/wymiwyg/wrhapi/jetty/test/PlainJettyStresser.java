@@ -33,6 +33,7 @@ import java.net.URL;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import org.junit.Test;
 
 
 /**
@@ -46,7 +47,7 @@ public class PlainJettyStresser {
      * @param args
      * @throws Exception
      */
-    public static void main(String[] args) throws Exception {
+    public static void main(String... args) throws Exception {
         for (int i = 0; i < 100; i++) {
             log.info("round " + i);
 
@@ -88,4 +89,9 @@ public class PlainJettyStresser {
             }
         }
     }
+
+	@Test
+	public void runAsTest() throws Exception {
+		main();
+	}
 }

@@ -25,6 +25,8 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.mortbay.jetty.Connector;
 import org.mortbay.jetty.Server;
 import org.mortbay.jetty.handler.AbstractHandler;
@@ -44,7 +46,7 @@ import org.wymiwyg.wrhapi.util.MessageBody2Write;
  */
 public class JettyWebServerFactory extends WebServerFactory {
 	
-	//private static final Log log = LogFactory.getLog(JettyWebServerFactory.class);
+	private static final Log log = LogFactory.getLog(JettyWebServerFactory.class);
 	
 
 	
@@ -73,6 +75,7 @@ public class JettyWebServerFactory extends WebServerFactory {
                         
                     } catch (final HandlerException e) {
                     	responseImpl.setResponseStatus(e.getStatus());
+						log.warn("Exception handling request", e);
                     	try {
 							responseImpl.setBody(new MessageBody2Write() {
 								public void writeTo(WritableByteChannel out) throws IOException {

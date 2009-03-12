@@ -67,9 +67,9 @@ public class JettyWebServerFactory extends WebServerFactory {
 
 			public void handle(String arg0,
 					HttpServletRequest servletRequest,
-					HttpServletResponse servletResponse, int arg3)
+					final HttpServletResponse servletResponse, int arg3)
 					throws IOException, ServletException {
-				ResponseImpl responseImpl = new ResponseImpl();
+				final ResponseImpl responseImpl = new ResponseImpl();
 				try {
 
 					handler.handle(new RequestImpl(servletRequest, configuration.getPort()),
@@ -91,31 +91,25 @@ public class JettyWebServerFactory extends WebServerFactory {
 						throw new RuntimeException(e1);
 					}
 				}
-				boolean headersWritten = false;
+				final boolean[] headersWritten = new boolean[1];
 				OutputStream out = servletResponse.getOutputStream();
 				final MessageBody body = responseImpl.getBody();
 				if (body != null) {
 					
 					WritableByteChannel outChannel = Channels.newChannel(out);
-					ReadableByteChannel in = body.read();
-					ByteBuffer buffer = ByteBuffer.allocateDirect(4096);
-					while (in.read(buffer) != -1) {
+					FirstWriteActionChannel fwOut = new FirstWriteActionChannel(
+							outChannel, new Runnable() {
 
-						buffer.flip();
-						while (buffer.remaining() > 0) {
-							if (!headersWritten) {
-								commitStatusAndHeaders(servletResponse,
+						public void run() {
+							commitStatusAndHeaders(servletResponse,
 										responseImpl);
-								headersWritten = true;
-							}
-							outChannel.write(buffer);
+								headersWritten[0] = true;
 						}
-						buffer.clear();
-					}
-					
+					});
+					body.writeTo(fwOut);
 				}
 
-				if (!headersWritten) {
+				if (!headersWritten[0]) {
 					commitStatusAndHeaders(servletResponse, responseImpl);
 				}
 				out.close();

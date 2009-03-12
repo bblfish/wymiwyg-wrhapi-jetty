@@ -17,8 +17,11 @@
 package org.wymiwyg.wrhapi.jetty;
 
 import java.io.IOException;
+import java.io.OutputStream;
 import java.io.PrintWriter;
+import java.nio.ByteBuffer;
 import java.nio.channels.Channels;
+import java.nio.channels.ReadableByteChannel;
 import java.nio.channels.WritableByteChannel;
 
 import javax.servlet.ServletException;
@@ -33,11 +36,11 @@ import org.mortbay.jetty.handler.AbstractHandler;
 import org.mortbay.jetty.nio.SelectChannelConnector;
 import org.wymiwyg.wrhapi.Handler;
 import org.wymiwyg.wrhapi.HandlerException;
+import org.wymiwyg.wrhapi.MessageBody;
 import org.wymiwyg.wrhapi.ServerBinding;
 import org.wymiwyg.wrhapi.WebServer;
 import org.wymiwyg.wrhapi.WebServerFactory;
 import org.wymiwyg.wrhapi.util.MessageBody2Write;
-
 
 /**
  * @author reto
@@ -45,89 +48,108 @@ import org.wymiwyg.wrhapi.util.MessageBody2Write;
  * @scr.service interface="org.wymiwyg.wrhapi.WebServerFactory"
  */
 public class JettyWebServerFactory extends WebServerFactory {
-	
+
 	private static final Log log = LogFactory.getLog(JettyWebServerFactory.class);
-	
 
-	
-    /* (non-Javadoc)
-     * @see org.wymiwyg.wrhapi.WebServerFactory#startNewWebServer(org.wymiwyg.wrhapi.Handler, org.wymiwyg.wrhapi.ServerBinding)
-     */
-    public WebServer startNewWebServer(final Handler handler,
-        final ServerBinding configuration) throws IOException {
-        Server server = new Server() {
-                /*
-                 * public void handle(HttpConnection connection) {
-                 * System.out.println("hi"); }
-                 */
-            };
+	/* (non-Javadoc)
+	 * @see org.wymiwyg.wrhapi.WebServerFactory#startNewWebServer(org.wymiwyg.wrhapi.Handler, org.wymiwyg.wrhapi.ServerBinding)
+	 */
+	public WebServer startNewWebServer(final Handler handler,
+			final ServerBinding configuration) throws IOException {
+		Server server = new Server() {
+			/*
+			 * public void handle(HttpConnection connection) {
+			 * System.out.println("hi"); }
+			 */
+		};
 
-        server.addHandler(new AbstractHandler() {
-                public void handle(String arg0,
-                    HttpServletRequest servletRequest,
-                    HttpServletResponse servletResponse, int arg3)
-                    throws IOException, ServletException {
-                	ResponseImpl responseImpl = new ResponseImpl(servletResponse);
-                    try {
-                        
-                        handler.handle(new RequestImpl(servletRequest, configuration.getPort()),
-                            responseImpl);
-                        
-                    } catch (final HandlerException e) {
-                    	responseImpl.setResponseStatus(e.getStatus());
-						log.warn("Exception handling request", e);
-                    	try {
-							responseImpl.setBody(new MessageBody2Write() {
-								public void writeTo(WritableByteChannel out) throws IOException {
-									PrintWriter printWriter = new PrintWriter(Channels.newWriter(out, "utf-8"));
-									printWriter.println(e.getMessage());
-									printWriter.close();
-								}
-								
-							});
-						} catch (HandlerException e1) {
-							throw new RuntimeException(e1);
-						}
-                    } /*catch  (final RuntimeException e) {
-                    	log.error("Runtime exception handling request", e);
-                    	responseImpl.setResponseStatus(ResponseStatus.INTERNAL_SERVER_ERROR);
-                    	try {
-							responseImpl.setBody(new MessageBody2Write() {
-								public void writeTo(WritableByteChannel out) throws IOException {
-									PrintWriter printWriter = new PrintWriter(Channels.newWriter(out, "utf-8"));
-									printWriter.println("A runtime exception occured (see logs for details)");
-									printWriter.close();
-								}
-								
-							});
-						} catch (HandlerException e1) {
-							throw new RuntimeException(e1);
-						}
-                    } */
-                    try {
-						responseImpl.commitIfNeeded();
-					} catch (HandlerException e) {
-						throw new RuntimeException(e);
+		server.addHandler(new AbstractHandler() {
+
+			public void handle(String arg0,
+					HttpServletRequest servletRequest,
+					HttpServletResponse servletResponse, int arg3)
+					throws IOException, ServletException {
+				ResponseImpl responseImpl = new ResponseImpl();
+				try {
+
+					handler.handle(new RequestImpl(servletRequest, configuration.getPort()),
+							responseImpl);
+
+				} catch (final HandlerException e) {
+					responseImpl.setResponseStatus(e.getStatus());
+					log.warn("Exception handling request", e);
+					try {
+						responseImpl.setBody(new MessageBody2Write() {
+
+							public void writeTo(WritableByteChannel out) throws IOException {
+								PrintWriter printWriter = new PrintWriter(Channels.newWriter(out, "utf-8"));
+								printWriter.println(e.getMessage());
+								printWriter.close();
+							}
+						});
+					} catch (HandlerException e1) {
+						throw new RuntimeException(e1);
 					}
-                }
-            });
+				}
+				boolean headersWritten = false;
+				OutputStream out = servletResponse.getOutputStream();
+				final MessageBody body = responseImpl.getBody();
+				if (body != null) {
+					
+					WritableByteChannel outChannel = Channels.newChannel(out);
+					ReadableByteChannel in = body.read();
+					ByteBuffer buffer = ByteBuffer.allocateDirect(4096);
+					while (in.read(buffer) != -1) {
 
-        Connector connector = new SelectChannelConnector();//BlockingChannelConnector();
-        connector.setPort(configuration.getPort());
-        server.addConnector(connector);
+						buffer.flip();
+						while (buffer.remaining() > 0) {
+							if (!headersWritten) {
+								commitStatusAndHeaders(servletResponse,
+										responseImpl);
+								headersWritten = true;
+							}
+							outChannel.write(buffer);
+						}
+						buffer.clear();
+					}
+					
+				}
 
-        try {
-            server.start();
-        } catch (Exception e) {
+				if (!headersWritten) {
+					commitStatusAndHeaders(servletResponse, responseImpl);
+				}
+				out.close();
+
+			}
+
+			private void commitStatusAndHeaders(
+					HttpServletResponse servletResponse,
+					ResponseImpl responseImpl) {
+				if (responseImpl.getStatus() != null) {
+					servletResponse.setStatus(responseImpl.getStatus().getCode());
+				} else {
+					servletResponse.setStatus(200);
+				}
+				responseImpl.writeHeaders(servletResponse);
+			}
+		});
+
+		Connector connector = new SelectChannelConnector();//BlockingChannelConnector();
+		connector.setPort(configuration.getPort());
+		server.addConnector(connector);
+
+		try {
+			server.start();
+		} catch (Exception e) {
 			if (e instanceof IOException) {
-				throw (IOException)e;
+				throw (IOException) e;
 			}
 			if (e instanceof RuntimeException) {
-				throw (RuntimeException)e;
+				throw (RuntimeException) e;
 			}
-            throw new RuntimeException(e);
-        }
+			throw new RuntimeException(e);
+		}
 
-        return new JettyWebServer(server);
-    }
+		return new JettyWebServer(server);
+	}
 }

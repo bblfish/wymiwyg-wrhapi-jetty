@@ -22,6 +22,7 @@ import java.nio.channels.WritableByteChannel;
 import java.util.Iterator;
 import java.util.Map;
 
+import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.logging.Log;
@@ -38,75 +39,34 @@ import org.wymiwyg.wrhapi.util.ResponseBase;
  */
 public class ResponseImpl extends ResponseBase {
     private static final Log log = LogFactory.getLog(ResponseImpl.class);
-    private ResponseStatus status = null;
-    private HttpServletResponse servletResponse;
-    private boolean committed;
 
-    // private boolean bodyWriting = false;
-    private Thread bodyWriter = null;
+	private ResponseStatus status = null;
+
+	private MessageBody body;
 
     // private Exception bodyWriteException;
 
-    /**
-     * @param servletResponse
-     */
-    public ResponseImpl(HttpServletResponse servletResponse) {
-        this.servletResponse = servletResponse;
-    }
+
 
     public void setBody(MessageBody body) throws HandlerException {
-        commitHeader();
-
-        try {
-            //servletResponse.getOutputStream().write("hello\n".getBytes());
-            //servletResponse.flushBuffer();
-			if (body != null) {
-				WritableByteChannel out = Channels.newChannel(servletResponse.getOutputStream());
-				body.writeTo(out);
-				out.close();
-			}
-        } catch (IOException e1) {
-            throw new HandlerException(e1);
-        }
+        this.body = body;
     }
 
-    private void commitHeader() throws HandlerException {
-        synchronized (this) {
-            if (committed == true) {
-                throw new HandlerException("Response already committed");
-            }
 
-            committed = true;
-        }
 
-        if (status == null) {
-            status = ResponseStatus.SUCCESS;
-        }
-
-        servletResponse.setStatus(status.getCode());
-        writeHeaders();
+    public void setResponseStatus(ResponseStatus status) {
+        this.status = status;
     }
 
-    void commitIfNeeded() throws HandlerException {
-        if (!committed) {
-            synchronized (this) {
-                if (!committed) {
-                    commitHeader();
+	MessageBody getBody() {
+		return body;
+	}
 
-                    try {
-                        servletResponse.getOutputStream().close();
-                    } catch (IOException e) {
-                        throw new HandlerException(e);
-                    }
-                }
-            }
-        }
-    }
+	ResponseStatus getStatus() {
+		return status;
+	}
 
-    /**
-     *
-     */
-    private void writeHeaders() {
+    void writeHeaders(HttpServletResponse servletResponse) {
     	Map<HeaderName, String[]> headerMap = getHeaderMap();
         Iterator<HeaderName> keyIter = headerMap.keySet().iterator();
 
@@ -137,7 +97,11 @@ public class ResponseImpl extends ResponseBase {
         }
     }
 
-    /**
+    
+
+
+
+	/**
      * @param values
      * @return
      */
@@ -158,48 +122,7 @@ public class ResponseImpl extends ResponseBase {
         return buffer.toString();
     }
 
+
+
     
-
-    public void setResponseStatus(ResponseStatus status) {
-        this.status = status;
-    }
-
-    synchronized void waitTillBodyWritten() throws HandlerException {
-        if (!committed) {
-            commitHeader();
-        }
-
-        if (log.isDebugEnabled()) {
-            log.debug("waiting till body-written");
-        }
-
-        if (bodyWriter != null) {
-            try {
-                int i = 0;
-
-                while (bodyWriter.isAlive()) {
-                    bodyWriter.join(30000);
-
-                    if (bodyWriter.isAlive()) {
-                        log.info(
-                            "body hasn't finished writing even after waiting " +
-                            (i++ * 30) + "s");
-                    }
-                }
-
-                if (log.isDebugEnabled()) {
-                    log.debug("joined body-writer");
-                }
-
-                bodyWriter = null;
-            } catch (InterruptedException e) {
-                log.warn(e.toString(), e);
-            }
-        }
-
-        /*
-         * if (bodyWriteException != null) { throw new
-         * HandlerException("Exception writting body", bodyWriteException); }
-         */
-    }
 }

@@ -97,7 +97,7 @@ public class JettyWebServerFactory extends WebServerFactory {
 				if (body != null) {
 					
 					WritableByteChannel outChannel = Channels.newChannel(out);
-					FirstWriteActionChannel fwOut = new FirstWriteActionChannel(
+					FirstWriteOrCloseActionChannel fwOut = new FirstWriteOrCloseActionChannel(
 							outChannel, new Runnable() {
 
 						public void run() {

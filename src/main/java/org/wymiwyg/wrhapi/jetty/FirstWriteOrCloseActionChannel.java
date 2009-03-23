@@ -25,13 +25,13 @@ import java.nio.channels.WritableByteChannel;
  *
  * @author reto
  */
-public class FirstWriteActionChannel implements WritableByteChannel {
+public class FirstWriteOrCloseActionChannel implements WritableByteChannel {
 
 	private WritableByteChannel base;
 	private Runnable action;
 	private boolean first = true;
 
-	public FirstWriteActionChannel(WritableByteChannel base, Runnable action) {
+	public FirstWriteOrCloseActionChannel(WritableByteChannel base, Runnable action) {
 		this.base = base;
 		this.action = action;
 	}
@@ -51,6 +51,10 @@ public class FirstWriteActionChannel implements WritableByteChannel {
 	}
 
 	public void close() throws IOException {
+		if (first) {
+			action.run();
+			first = false;
+		}
 		base.close();
 	}
 

@@ -16,17 +16,12 @@
  */
 package org.wymiwyg.wrhapi.jetty;
 
-import java.io.IOException;
-import java.nio.channels.Channels;
-import java.nio.channels.WritableByteChannel;
 import java.util.Iterator;
 import java.util.Map;
 
-import javax.servlet.ServletResponse;
+import java.util.logging.Logger;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.wymiwyg.wrhapi.HandlerException;
 import org.wymiwyg.wrhapi.HeaderName;
 import org.wymiwyg.wrhapi.MessageBody;
@@ -38,7 +33,7 @@ import org.wymiwyg.wrhapi.util.ResponseBase;
  * @author reto
  */
 public class ResponseImpl extends ResponseBase {
-    private static final Log log = LogFactory.getLog(ResponseImpl.class);
+    private final static Logger log = Logger.getLogger(ResponseImpl.class.getName());
 
 	private ResponseStatus status = null;
 

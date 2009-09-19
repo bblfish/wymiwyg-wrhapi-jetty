@@ -16,24 +16,25 @@
  */
 package org.wymiwyg.wrhapi.jetty;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.nio.ByteBuffer;
 import java.nio.channels.Channels;
-import java.nio.channels.ReadableByteChannel;
 import java.nio.channels.WritableByteChannel;
 
+import java.util.Enumeration;
+import java.util.logging.Logger;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-import org.mortbay.jetty.Connector;
-import org.mortbay.jetty.Server;
-import org.mortbay.jetty.handler.AbstractHandler;
-import org.mortbay.jetty.nio.SelectChannelConnector;
+import org.eclipse.jetty.server.Connector;
+import org.eclipse.jetty.server.Request;
+import org.eclipse.jetty.server.Server;
+import org.eclipse.jetty.server.handler.AbstractHandler;
+import org.eclipse.jetty.server.nio.SelectChannelConnector;
 import org.wymiwyg.wrhapi.Handler;
 import org.wymiwyg.wrhapi.HandlerException;
 import org.wymiwyg.wrhapi.MessageBody;
@@ -49,7 +50,7 @@ import org.wymiwyg.wrhapi.util.MessageBody2Write;
  */
 public class JettyWebServerFactory extends WebServerFactory {
 
-	private static final Log log = LogFactory.getLog(JettyWebServerFactory.class);
+	private final static Logger log = Logger.getLogger(JettyWebServerFactory.class.getName());
 
 	/* (non-Javadoc)
 	 * @see org.wymiwyg.wrhapi.WebServerFactory#startNewWebServer(org.wymiwyg.wrhapi.Handler, org.wymiwyg.wrhapi.ServerBinding)
@@ -63,12 +64,12 @@ public class JettyWebServerFactory extends WebServerFactory {
 			 */
 		};
 
-		server.addHandler(new AbstractHandler() {
+		server.setHandler(new AbstractHandler() {
 
-			public void handle(String arg0,
+			public void handle(String target,
+					Request baseRequest,
 					HttpServletRequest servletRequest,
-					final HttpServletResponse servletResponse, int arg3)
-					throws IOException, ServletException {
+					final HttpServletResponse servletResponse) throws IOException, ServletException {
 				final ResponseImpl responseImpl = new ResponseImpl();
 				try {
 
@@ -77,7 +78,7 @@ public class JettyWebServerFactory extends WebServerFactory {
 
 				} catch (final HandlerException e) {
 					responseImpl.setResponseStatus(e.getStatus());
-					log.warn("Exception handling request", e);
+					log.warning("Exception handling request"+ e);
 					try {
 						responseImpl.setBody(new MessageBody2Write() {
 
@@ -106,6 +107,9 @@ public class JettyWebServerFactory extends WebServerFactory {
 								headersWritten[0] = true;
 						}
 					});
+					ByteArrayOutputStream baos = new ByteArrayOutputStream();
+					WritableByteChannel outChannel2 = Channels.newChannel(baos);
+					body.writeTo(outChannel2);
 					body.writeTo(fwOut);
 				}
 

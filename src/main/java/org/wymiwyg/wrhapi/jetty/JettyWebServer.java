@@ -16,10 +16,11 @@
  */
 package org.wymiwyg.wrhapi.jetty;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import java.util.logging.Logger;
 
-import org.mortbay.jetty.Server;
+
+import org.eclipse.jetty.server.Server;
+
 
 import org.wymiwyg.wrhapi.WebServer;
 
@@ -29,7 +30,7 @@ import org.wymiwyg.wrhapi.WebServer;
  *
  */
 public class JettyWebServer implements WebServer {
-    private final static Log log = LogFactory.getLog(JettyWebServer.class);
+    private final static Logger log = Logger.getLogger(JettyWebServer.class.getName());
     private Server server;
 
     /**

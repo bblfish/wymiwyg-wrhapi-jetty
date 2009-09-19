@@ -8,14 +8,19 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org.wymiwyg</groupId>
 	<artifactId>wrhapi-jetty</artifactId>
-	<version>0.7</version>
+	<version>0.8-SNAPSHOT</version>
 	<packaging>bundle</packaging>
 	<name>WRHAPI Jetty</name>
 	<dependencies>
 		<dependency>
 			<groupId>org.wymiwyg</groupId>
 			<artifactId>wrhapi</artifactId>
-			<version>0.7</version>
+			<version>0.8-SNAPSHOT</version>
+		</dependency>
+		<dependency>
+			<groupId>org.eclipse.jetty</groupId>
+			<artifactId>jetty-server</artifactId>
+			<version>7.0.0.RC2</version>
 		</dependency>
 		<dependency>
 			<groupId>org.mortbay.jetty</groupId>
@@ -31,6 +36,12 @@
 			<groupId>org.wymiwyg</groupId>
 			<artifactId>wrhapi-testing</artifactId>
 			<version>0.7</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.wymiwyg</groupId>
+			<artifactId>wymiwyg-commons-core</artifactId>
+			<version>0.7.4</version>
 			<scope>test</scope>
 		</dependency>
 		<dependency>
@@ -90,6 +101,7 @@
 			<plugin>
 				<groupId>org.apache.felix</groupId>
 				<artifactId>maven-scr-plugin</artifactId>
+				<version>1.2.0</version>
 				<executions>
 					<execution>
 						<id>generate-scr-scrdescriptor</id>
@@ -111,3 +123,4 @@
 		</repository>
 	</distributionManagement>
 </project>
+

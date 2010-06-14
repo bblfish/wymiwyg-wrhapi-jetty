@@ -8,16 +8,16 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org.wymiwyg</groupId>
 	<artifactId>wrhapi-jetty</artifactId>
-	<version>0.8.1</version>
+	<version>0.9</version>
 	<packaging>bundle</packaging>
 	<name>WRHAPI Jetty</name>
 	<description>WRHAPI implementation on jetty</description>
-	<url>http://wrahpi.wymiwyg.org/</url>
+	<url>http://wrhapi.wymiwyg.org/</url>
 	<dependencies>
 		<dependency>
 			<groupId>org.wymiwyg</groupId>
 			<artifactId>wrhapi</artifactId>
-			<version>0.8.1</version>
+			<version>0.9</version>
 		</dependency>
 		<dependency>
 			<groupId>org.eclipse.jetty</groupId>

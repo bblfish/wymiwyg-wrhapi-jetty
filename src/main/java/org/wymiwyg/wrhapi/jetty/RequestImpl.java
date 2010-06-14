@@ -16,6 +16,7 @@
  */
 package org.wymiwyg.wrhapi.jetty;
 
+import java.security.cert.X509Certificate;
 import org.wymiwyg.wrhapi.HandlerException;
 import org.wymiwyg.wrhapi.HeaderName;
 import org.wymiwyg.wrhapi.MessageBody;
@@ -157,5 +158,10 @@ public class RequestImpl implements Request {
 			}
 			
 		};
+	}
+
+	public X509Certificate[] getCertificates() {
+		return (X509Certificate[])servletRequest.getAttribute(
+				"javax.servlet.request.X509Certificate");
 	}
 }
